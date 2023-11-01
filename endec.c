@@ -11,7 +11,7 @@ void encryptDataRSA(char * message, mpz_t key[]){
 	int len = 0;
 	char c;
 	fp = fopen(message, "r");
-
+    gmp_printf("[DEBUG] n=%Zd e=%Zd\n",key[0], key[1]);
 	//in case something goes wrong
 	if (fp==NULL){
 		printf("File error!!!\n");
@@ -47,21 +47,19 @@ void encryptDataRSA(char * message, mpz_t key[]){
     printf("[DEBUG]message is: %s\n", messageStr);
  	i=0;
     mpz_t msgChar, ciphChar;
-    char tmp[len];
     mpz_inits(msgChar, ciphChar, NULL);
 
     do{
-    	mpz_set_ui(msgChar, (unsigned int)messageStr[i]);
+    	mpz_set_ui(msgChar, messageStr[i]);
     	mpz_powm(ciphChar, msgChar, key[1], key[0]); //c = m^e mod n
-    	tmp[i] = (char) mpz_get_ui(ciphChar);
-    	//mpz_get_str(tmp, 10, ciphChar);
-    	fprintf(outputFile, "%c", tmp[i]);
+    	//gmp_fprintf(outputFile, "%Zd", ciphChar);
+        fprintf(outputFile, "%u", (unsigned int)mpz_get_ui(ciphChar));
+        printf("%u\t", (unsigned int)mpz_get_ui(ciphChar));
     	i++;
     }while(i<len);
-
-    printf("[DEBUG] ciphered text is: %s\n", tmp);
+    printf("\n");
     //preventing memory leaks
-    mpz_clears(msgChar, ciphChar);
+    mpz_clears(msgChar, ciphChar, NULL);
     free(messageStr);
     fclose(fp);
     fclose(outputFile);
@@ -72,6 +70,38 @@ FILE* decryptDataDH(char* message, mpz_t key[]){
 	return NULL;
 } 
 
-FILE* decryptDataRSA(char* message, mpz_t key[]){
-	return NULL;
+void decryptDataRSA(char* message, mpz_t key[]){
+	FILE * fp;
+    FILE *output;
+	int len = 0;
+    char *fName = "cipheredRSA.txt";
+
+	fp = fopen(message, "r");
+    output = fopen(fName, "w");
+	//in case something goes wrong with files
+	if (fp==NULL || output==NULL){
+		printf("File error!!!\n");
+		return;
+	}
+	
+	fseek(fp, 0, SEEK_END); 
+    len = ftell(fp); //length of file (bytes)
+    fseek(fp, 0, SEEK_SET);
+
+    mpz_t ciphChar, msgChar;
+    unsigned int ciphInt;
+    mpz_inits(ciphChar, msgChar, NULL);
+
+    while (fscanf(fp, "%u", &ciphInt) != EOF)
+    {
+        mpz_set_ui(ciphChar, ciphInt);
+        mpz_powm(msgChar, ciphChar, key[1], key[0]); // m = c^d mod n
+        printf("Character read: %c \n", ciphInt);
+        fprintf(output, "%u", (unsigned)mpz_get_ui(msgChar));
+        fprintf(stdout, "%u\t", ciphInt);
+    }
+    printf("\n");
+    mpz_clears(ciphChar, msgChar, NULL);
+    fclose(fp);
+    fclose(output);
 } 

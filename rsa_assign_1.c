@@ -7,9 +7,12 @@ int main(int argc, char * args[]){
 		mpz_inits(key[0], key[1], NULL);
 		mpz_set_si(key[0], 33);
 		mpz_set_si(key[1], 7);
+		encryptDataRSA("message.txt", key);
+		mpz_set_si(key[1], 3);
+		decryptDataRSA("cipheredRSA.txt", key);
 	for(int i=0; i<argc; i++){
 		printf("[DEBUG] No:%d arg:%s\n", i, args[i]);
-		encryptDataRSA("message.txt", key);
+		
 		/*switch(){
 			case "-i":
 

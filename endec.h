@@ -6,4 +6,4 @@ FILE* encryptDataDH(char *message, mpz_t key[]); //reads message from file encry
 FILE* decryptDataDH(char *message, mpz_t key[]); //vise versa
 
 void encryptDataRSA(char *message, mpz_t key[]);
-FILE* decryptDataRSA(char *message, mpz_t key[]);
+void decryptDataRSA(char *message, mpz_t key[]);
