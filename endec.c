@@ -15,6 +15,7 @@ void encryptDataRSA(char * message, mpz_t key[]){
 	//in case something goes wrong
 	if (fp==NULL){
 		printf("File error!!!\n");
+		return;
 	}
 	
 	fseek(fp, 0, SEEK_END); 
@@ -53,12 +54,14 @@ void encryptDataRSA(char * message, mpz_t key[]){
     	mpz_set_ui(msgChar, (unsigned int)messageStr[i]);
     	mpz_powm(ciphChar, msgChar, key[1], key[0]); //c = m^e mod n
     	tmp[i] = (char) mpz_get_ui(ciphChar);
-    	fputc(tmp[i], outputFile);
+    	//mpz_get_str(tmp, 10, ciphChar);
+    	fprintf(outputFile, "%c", tmp[i]);
     	i++;
     }while(i<len);
 
     printf("[DEBUG] ciphered text is: %s\n", tmp);
     //preventing memory leaks
+    mpz_clears(msgChar, ciphChar);
     free(messageStr);
     fclose(fp);
     fclose(outputFile);
