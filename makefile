@@ -1,17 +1,25 @@
-CC=gcc
-CFLAGS = -g -Wall
+CC = gcc
+CFLAGS = -Wall -g
 LIBS = -lgmp
 
-SOURCES = main.c keygen.c
-OBJS = $(SOURCES:.c=.o)
+SOURCES1 = keygen.c rsa_assign_1.c endec.c  
+SOURCES2 = keygen.c dh_assign_1.c endec.c  
 
-all: bitsys
+OBJS1 = $(SOURCES1:.c=.o)
+OBJS2 = $(SOURCES2:.c=.o)
 
-bitsys: $(OBJS) 
+
+all: rsa_assign_1 dh_assign_1
+
+rsa_assign_1: $(OBJS1)
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
+dh_assign_1: $(OBJS2)
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)	
+
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $^
+	$(CC) $(CFLAGS) -c -o $@ $^ 
 
 clean:
-	rm -f  bitsys $(OBJS)
+	rm -f  rsa_assign_1  dh_assign_1 $(OBJS1) $(OBJS2)
+
