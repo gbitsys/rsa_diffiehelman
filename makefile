@@ -14,4 +14,4 @@ bitsys: $(OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $^
 
 clean:
-	rm -f m bitsys $(OBJS)
+	rm -f  bitsys $(OBJS)

@@ -1,4 +1,9 @@
 #include<gmp.h>
+#include<stdlib.h>
+#include<stdio.h>
 
-char* encryptData(char *inFlow, mpz_t key);
-char* decryptData(char *outFlow, mpz_t key);
+FILE* encryptDataDH(char *message, mpz_t key[]); //reads message from file encrypt and generates cipher text
+FILE* decryptDataDH(char *message, mpz_t key[]); //vise versa
+
+void encryptDataRSA(char *message, mpz_t key[]);
+FILE* decryptDataRSA(char *message, mpz_t key[]);

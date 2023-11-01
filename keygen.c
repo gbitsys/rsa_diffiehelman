@@ -1,10 +1,7 @@
-#include<stdio.h>
-#include<gmp.h>
-#include<time.h>
 #include"keygen.h"
-#include<stdlib.h>
 
-void keygen(mpz_t p, mpz_t q, mpz_t keyLength, mpz_t result)
+
+void keygen(mpz_t p, mpz_t q, mpz_t keyLength, mpz_t result[])
 {
   //declaring variables suitable with gmp stdlib
   mpz_t key, n, lamda, epsilon;

@@ -1,6 +1,6 @@
-#include<stdio.h>
-#include<gmp.h>
 #include"keygen.h" 
 
 
-
+int main(int argc, char * args[]){
+	return 0;
+}
