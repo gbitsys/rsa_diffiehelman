@@ -1,97 +1,88 @@
-#include<gmp.h>
-#include<stdlib.h>
-#include<stdio.h>
-#include<string.h>
+#include"endec.h"
+
+FILE* encryptDataDH(char * message, mpz_t key[]){
+	return NULL;
+} 
 
 //insert a message (name of file), an encryption key [n, e] receive encrypted message (RSA)
-//key[0] = n, key[1] = e
+//key[0] = n, key[1] = e, key[2]=d
 void encryptDataRSA(char * message, mpz_t key[]){
-	FILE *fp;
+	FILE * fp;
     FILE *output;
-    char *fName = "cipheredRSA.txt";
+    char *fName = "cipheredRSA2.txt";
 	int len = 0;
 	char c;
+	fp = fopen(message, "r");
     output = fopen(fName, "w");
-    //gmp_printf("[DEBUG] n=%Zd e=%Zd\n",key[0], key[1]);
 	//in case something goes wrong
-	if (output ==NULL){
+	if (fp==NULL || output==NULL){
 		printf("File error!!!\n");
 		return;
 	}
+	
+	fseek(fp, 0, SEEK_END); 
+    len = ftell(fp); //length of file (bytes)
+    fseek(fp, 0, SEEK_SET);
 
-    char *messageStr = "pavlo gamiesai"; //this variable used to read text from the file 
+    char *messageStr; //this variable used to read text from the file 
+    messageStr = malloc(sizeof(char)*len);
     mpz_t ciphChar, msgChar;
     mpz_inits(msgChar, ciphChar, NULL);
     int i=0;
-    for(i=0;i<(int)strlen(messageStr);i++)
+    while (i<len)
     {
-        //printf("hello world\n");
-        char c = messageStr[i]; //reading char one by one 
-        mpz_set_si(msgChar, (int)c);
+        c = fgetc(fp);
+        messageStr[i++] = (char) c; //reading char one by one 
+        mpz_set_ui(msgChar, (unsigned int)c);
         mpz_powm(ciphChar, msgChar, key[1], key[0]); // m = c^d mod n
         gmp_fprintf(output, "%Zd\n", ciphChar);
-        //break;
+
     }
+    messageStr[i]='\0';
    
-    //printf("[DEBUG]message is: %s\n", messageStr);
-
-    
-
     //preventing memory leaks
     mpz_clears(msgChar, ciphChar, NULL);
+    free(messageStr);
     fclose(output);
-} ;
+    fclose(fp);
 
-void decryptDataRSA(mpz_t key[]){
-	FILE * input;
+} 
+
+FILE* decryptDataDH(char* message, mpz_t key[]){
+
+	return NULL;
+} 
+
+void decryptDataRSA(char* message, mpz_t key[]){
+	FILE * fp;
     FILE *output;
-	int len = 0;
-    char *fName = "decipheredRSA.txt";
-
-	input = fopen("cipheredRSA.txt", "r");
-    output = fopen(fName, "w");
+    char *fName = "cipheredRSA2.txt";
+    char *outputName = "decipheredRSAw.txt";
+    int len = 0;
+	fp = fopen(fName, "r");
+    output = fopen(outputName, "w");
 	//in case something goes wrong with files
-	if (input==NULL || output==NULL){
+	if (fp==NULL || output==NULL){
 		printf("File error!!!\n");
 		return;
 	}
+	
+    fseek(fp, 0, SEEK_END); 
+    len = ftell(fp); //length of file (bytes)
+    fseek(fp, 0, SEEK_SET);
 
     mpz_t ciphChar, msgChar;
-    int ciphInt;
     mpz_inits(ciphChar, msgChar, NULL);
-    //printf("hello\n");
-    while (!feof(input))
-    {   
-        mpz_inp_str(ciphChar, input, 10);
-        //gmp_printf("%Zd\n", ciphChar);
-        mpz_powm(msgChar, ciphChar, key[1], key[0]); // m = c^d mod n
-        //gmp_printf("%Zd\n", msgChar);
-        gmp_printf("%c\n", (char)mpz_get_si(msgChar));
-        //fprintf(output, "%c", (int)mpz_get_si(msgChar));
-        //fprintf(stdout, "%c\t", (char)ciphInt);
-        //i++;
+    int i=0;
+    while (!feof(fp))
+    {
+        mpz_inp_str(ciphChar, fp, 10);
+        mpz_powm(msgChar, ciphChar, key[2], key[0]); // m = c^d mod n
+        gmp_fprintf(output, "%c", (char)mpz_get_ui(msgChar));
     }
-    printf("\n");
+    gmp_fprintf(output, "%c", '\n');
+    //preventing memory leaks 
     mpz_clears(ciphChar, msgChar, NULL);
-    fclose(input);
+    fclose(fp);
     fclose(output);
-} ;
-
-int main(){
-
-    mpz_t key[2];
-    mpz_inits(key[0], key[1], NULL);
-    mpz_set_si(key[0], 3233);
-    mpz_set_si(key[1], 17);
-    char* text = "message.txt";
-    encryptDataRSA(text, key);
-
-    mpz_t keyt[2];
-    mpz_inits(keyt[0], keyt[1], NULL);
-    mpz_set_si(keyt[0], 3233);
-    mpz_set_si(keyt[1], 413);
-
-    decryptDataRSA(keyt);
-
-    return 0;
-}
+} 
