@@ -35,12 +35,12 @@ void encryptDataRSA(char * message, mpz_t key[]){
     {
         c = fgetc(fp);
         messageStr[i] = (char) c; //reading char one by one 
+        printf("M: %d\n", (int)messageStr[i]);
         mpz_set_ui(msgChar, (unsigned int)c);
         mpz_powm(ciphChar, msgChar, key[1], key[0]); // m = c^d mod n
-        gmp_printf("%Zd\n", ciphChar);
         cipherStr[i++]=(char)mpz_get_ui(ciphChar);
         //gmp_fprintf(output, "%Zd\n", ciphChar);
-        fprintf(output, "%u ", (unsigned)mpz_get_ui(ciphChar));
+        fprintf(output, "%u\n", (unsigned int)mpz_get_ui(ciphChar));
 
     }
     messageStr[i]='\0';
@@ -68,8 +68,9 @@ void decryptDataRSA(char* message, mpz_t key[]){
     FILE *output;
 	int len = 0;
     char *fName = "cipheredRSA2.txt";
-    char *outputName = "decipheredRSA.txt";
-
+    char *outputName = "decipheredRSA2.txt";
+    char c;
+    gmp_printf("[DEBUG] n=%Zd e=%Zd\n",key[0], key[1]);
 	fp = fopen(fName, "r");
     output = fopen(outputName, "w");
 	//in case something goes wrong with files
@@ -83,19 +84,15 @@ void decryptDataRSA(char* message, mpz_t key[]){
     fseek(fp, 0, SEEK_SET);
 
     mpz_t ciphChar, msgChar;
-    char ciphInt;
+    unsigned int ciphInt;
     mpz_inits(ciphChar, msgChar, NULL);
-
-    for (int i=0; i<len; i++)
+    int i=0;
+    while (fscanf(fp, "%u\n", &ciphInt)==1 && i<len)
     {
-        ciphInt = fgetc(fp);
-        //fscanf(fp, "%c ", &ciphInt);
-        //gmp_fscanf(fp, "%Zd\n", &ciphChar);
-        gmp_printf("%Zd\n", ciphChar);
-        //mpz_set_si(ciphChar, ciphInt);
         mpz_set_ui(ciphChar, (unsigned int)ciphInt);
+        //mpz_set_si(ciphChar, ciphInt);
         mpz_powm(msgChar, ciphChar, key[1], key[0]); // m = c^d mod n
-        fprintf(stdout, "%c", (char)mpz_get_ui(msgChar));
+        fprintf(output, "%c", (char)mpz_get_ui(msgChar));
         i++;
     }
     printf("\n");
