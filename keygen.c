@@ -1,5 +1,5 @@
 #include"keygen.h"
-
+#include<time.h>
 void keygen(mpz_t p, mpz_t q, mpz_t result[])
 {
   //declaring variables suitable with gmp stdlib
@@ -18,7 +18,7 @@ void keygen(mpz_t p, mpz_t q, mpz_t result[])
   
 	epsilonGen(lamda, epsilon);
 
-  mpz_invert(delta, epsilon, lamda);
+  mpz_invert(delta, epsilon[0], lamda);
   mpz_set(result[0], n); //result[0]=n
   mpz_set(result[1], epsilon[0]); //result[1]=e
   mpz_set(result[2], delta); //result[2]=d
@@ -40,9 +40,8 @@ void randomPair(mpz_t bitLength, mpz_t result[]){
   mpz_nextprime(p, randomNum);
   mpz_urandomb(randomNum, state, mpz_get_ui(bitLength)); //generate odd number (q)
   mpz_nextprime(q, randomNum);
- /* gmp_printf("Random mpz_t of %d bits: %Zd\n", bitLength, p);
-  gmp_printf("Random mpz_t of %d bits: %Zd\n", bitLength, q);*/
   keygen(p, q, result);
+
   //cleaning
   gmp_randclear(state);
   mpz_clears(p, q, randomNum,NULL);

@@ -1,7 +1,7 @@
 #include"endec.h"
 
 //insert a message (name of file), an encryption key [n, e] receive encrypted message (RSA)
-//key[0] = n, key[1] = e, key[2]=d
+//key[0] = n, key[1] = e
 void encryptDataRSA(char * inputFile, char* outputFile, mpz_t key[]){
 	FILE * fp;
     FILE *output;
@@ -18,8 +18,6 @@ void encryptDataRSA(char * inputFile, char* outputFile, mpz_t key[]){
 	fseek(fp, 0, SEEK_END); 
     len = ftell(fp); //length of file (bytes)
     fseek(fp, 0, SEEK_SET);
-    char *messageStr; //this variable used to read text from the file 
-    messageStr = malloc(sizeof(char)*len);
     mpz_t ciphChar, msgChar;
     mpz_inits(msgChar, ciphChar, NULL);
     int i = 0;
@@ -42,10 +40,10 @@ void encryptDataRSA(char * inputFile, char* outputFile, mpz_t key[]){
 
 } 
 
+//key[0] = n, key[1] = d
 void decryptDataRSA(char * inputFile, char* outputFile, mpz_t key[]){
 	FILE * fp;
     FILE *output;
-    int len = 0;
 	fp = fopen(inputFile, "r");
     output = fopen(outputFile, "w");
 	//in case something goes wrong with files
@@ -53,10 +51,6 @@ void decryptDataRSA(char * inputFile, char* outputFile, mpz_t key[]){
 		printf("File error!!!\n");
 		return;
 	}
-	
-    fseek(fp, 0, SEEK_END); 
-    len = ftell(fp); //length of file (bytes)
-    fseek(fp, 0, SEEK_SET);
 
     mpz_t ciphChar, msgChar;
     mpz_inits(ciphChar, msgChar, NULL);
