@@ -1,19 +1,14 @@
 #include"keygen.h"
 
-
 void keygen(mpz_t p, mpz_t q, mpz_t result[])
 {
   //declaring variables suitable with gmp stdlib
-  mpz_t delta, n, lamda, epsilon;
+  mpz_t delta, n, lamda;
+  mpz_t epsilon[1];
 
   //initializing them
-  mpz_inits(delta, n, lamda, epsilon, NULL);
+  mpz_inits(delta, n, lamda, epsilon[0], NULL);
 	mpz_set_si(delta, 0);
-
-  printf("[DEBUG] keygen start\n");
-
-	if (checkPrime(p)==0 || checkPrime(q)==0)
-		return ; //we can't generate a key for non prime numbers
 
  //calculating n using gmp library functions 
   mpz_mul(n, p, q); //n = p*q
@@ -25,72 +20,52 @@ void keygen(mpz_t p, mpz_t q, mpz_t result[])
 
   mpz_invert(delta, epsilon, lamda);
   mpz_set(result[0], n); //result[0]=n
-  mpz_set(result[1], epsilon); //result[1]=e
+  mpz_set(result[1], epsilon[0]); //result[1]=e
   mpz_set(result[2], delta); //result[2]=d
  //gmp_printf("[DEBUG] delta = %Zd\n", delta);
-  mpz_clears(delta, n, epsilon, lamda, NULL); //preventing memory leak
+  mpz_clears(delta, n, epsilon[0], lamda, NULL); //preventing memory leak
 
 }
 
 //given a key length this function generates key pair for RSA
-void randomPair(int bitLength, mpz_t result[]){
-  //generate randomness!?
+void randomPair(mpz_t bitLength, mpz_t result[]){
+  //generate randomness!
   gmp_randstate_t state;
   mpz_t p, q, randomNum;
   gmp_randinit_mt(state);
-  gmp_randseed_ui(state, time(NULL));
+  gmp_randseed_ui(state, (unsigned int)time(NULL));
   mpz_inits(p,q,randomNum, NULL);
 
-  do{
-    mpz_urandomb(randomNum, state, bitLength); //generate odd number (p)
-    mpz_nextprime(p, randomNum);
-    mpz_urandomb(randomNum, state, bitLength); //generate odd number (q)
-    mpz_nextprime(q, randomNum);
-  }while(mpz_cmp(p,q)==0);
-
+  mpz_urandomb(randomNum, state, mpz_get_ui(bitLength)); //generate odd number (p)
+  mpz_nextprime(p, randomNum);
+  mpz_urandomb(randomNum, state, mpz_get_ui(bitLength)); //generate odd number (q)
+  mpz_nextprime(q, randomNum);
  /* gmp_printf("Random mpz_t of %d bits: %Zd\n", bitLength, p);
   gmp_printf("Random mpz_t of %d bits: %Zd\n", bitLength, q);*/
-
   keygen(p, q, result);
   //cleaning
   gmp_randclear(state);
   mpz_clears(p, q, randomNum,NULL);
-
-}
-
-int checkPrime(mpz_t p)
-{
-  mpz_t result;
-  mpz_init(result);
-  mpz_gcd_ui(result,p,1);
-	if (mpz_odd_p(p)!=0 && mpz_cmp_si(result, 1)==0)
-  mpz_clear(result);
-		return 1;//true
-  mpz_clear(result);
-	return 0;//false
+  //result = [n, e, d]
 }
 
 //generates a random epsilon number where (e % lambda(n) != 0) AND (gcd(e, lambda) == 1)
-void epsilonGen(mpz_t lamda, mpz_t result)
+void epsilonGen(mpz_t lamda, mpz_t result[])
 {
-  //initializing variables
-  //temp is used just for storing calculations
-  //index is the epsilon we calculate
-	mpz_t index, gcdResult, temp;
-  mpz_inits(index, gcdResult, temp, NULL);
-  printf("[DEBUG] inside epsilonGen\n");
+  gmp_randstate_t state;
+  mpz_t randomNum, e, gcdResult, modResult;
+  gmp_randinit_mt(state);
+  gmp_randseed_ui(state, time(NULL));
+  mpz_inits(randomNum, e, gcdResult, modResult, NULL);
   
- //gmp_printf("[DEBUG] index: %Zd\n", index);
-
-  for (;;){
-    mpz_gcd(gcdResult, index, lamda);
-    mpz_mod(temp, index, lamda); //performing index%lamda
-    if (mpz_cmp_si(temp, 0)!=0  && mpz_cmp_si(gcdResult, 1)==0 && mpz_cmp_si(index, 1)!=0) 
-      break;
-    //sizeof(length)==mpz_sizeinbase(index, 2)
-    mpz_add_ui(index,index, 1);
-	}
+  do{
+    mpz_urandomb(randomNum, state, 256);
+    mpz_nextprime(e, randomNum);
+    mpz_gcd(gcdResult, e, lamda);
+    mpz_mod(modResult, e, lamda);
+  }while(!(mpz_cmp_si(modResult, 0)!=0 && mpz_cmp_si(gcdResult, 1)==0));
   //gmp_printf("[DEBUG] epsilon: %Zd\n", index);
-  mpz_set(result, index);
-  mpz_clears(index, gcdResult, temp, NULL);
+
+  mpz_set(result[0], e);
+  mpz_clears(randomNum, e, gcdResult, modResult, NULL);
 }
