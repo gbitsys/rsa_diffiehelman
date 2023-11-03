@@ -21,5 +21,5 @@ dh_assign_1: $(OBJS2)
 	$(CC) $(CFLAGS) -c -o $@ $^ 
 
 clean:
-	rm -f  rsa_assign_1  dh_assign_1 private* public* performance.txt $(OBJS1) $(OBJS2)
+	rm -f  rsa_assign_1  dh_assign_1 private* public* performance.txt pCipher.txt pDecipher.txt $(OBJS1) $(OBJS2)
 

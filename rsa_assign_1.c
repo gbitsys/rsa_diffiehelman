@@ -76,7 +76,7 @@ int main(int argc, char * argv[]){
 	}
     if(func!=NULL && strcmp(func, "all") == 0){
         printf("Check file 'performance.txt' for statistics\n");
-		performance("message.txt","pCipher.txt", "pDecipher");
+		performance("message.txt","pCipher.txt", "pDecipher.txt");
 	}
     
 
@@ -155,7 +155,6 @@ void performance(char *input, char *cipherTxt, char *decipherTxt){
     if(fp==NULL) return;//checking for file error
 
     clock_t start, end;
-    double cpu_time_used;
     mpz_t keyLength;
     mpz_t keys[2];
     mpz_inits(keyLength, keys[0], keys[1],NULL);
