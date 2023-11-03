@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
     gmp_printf("Alice and Bob share key is: %Zd\t%Zd\n", Alice->result, Bob->result);
 
-    gmp_fprintf(fptr, "%Zd,%Zd,%Zd", Alice->secret_choice, Bob->secret_choice, Alice->result);
+    gmp_fprintf(fptr, "%Zd,%Zd,%Zd", Alice->choice_sent, Bob->choice_sent, Alice->result);
 
     free(Alice);
     free(Bob);
