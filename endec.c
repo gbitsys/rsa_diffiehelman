@@ -1,14 +1,14 @@
 #include"endec.h"
 
 //insert a message (name of file), an encryption key [n, e] receive encrypted message (RSA)
-//key[0] = n, key[1] = e, key[2]=d
-void encryptDataRSA(char * input_file, char* output_file, mpz_t key[]){
+//key[0] = n, key[1] = e
+void encryptDataRSA(char * inputFile, char* outputFile, mpz_t key[]){
 	FILE * fp;
     FILE *output;
 	int len = 0;
 	char c;
-	fp = fopen(input_file, "r");
-    output = fopen(output_file, "w");
+	fp = fopen(inputFile, "r");
+    output = fopen(outputFile, "w");
 	//in case something goes wrong
 	if (fp==NULL || output==NULL){
 		printf("File error!!!\n");
@@ -40,21 +40,17 @@ void encryptDataRSA(char * input_file, char* output_file, mpz_t key[]){
 
 } 
 
-void decryptDataRSA(char * input_file, char* output_file, mpz_t key[]){
+//key[0] = n, key[1] = d
+void decryptDataRSA(char * inputFile, char* outputFile, mpz_t key[]){
 	FILE * fp;
     FILE *output;
-    int len = 0;
-	fp = fopen(input_file, "r");
-    output = fopen(output_file, "w");
+	fp = fopen(inputFile, "r");
+    output = fopen(outputFile, "w");
 	//in case something goes wrong with files
 	if (fp==NULL || output==NULL){
 		printf("File error!!!\n");
 		return;
 	}
-	
-    fseek(fp, 0, SEEK_END); 
-    len = ftell(fp); //length of file (bytes)
-    fseek(fp, 0, SEEK_SET);
 
     mpz_t ciphChar, msgChar;
     mpz_inits(ciphChar, msgChar, NULL);
