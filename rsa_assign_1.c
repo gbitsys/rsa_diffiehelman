@@ -3,41 +3,78 @@
 #include <stdlib.h>
 #include <string.h>
 #include <gmp.h>
+#define DEFAULTLEN 256
 
 int main(int argc, char * argv[]){
 
 	mpz_t key_len;
 	mpz_init(key_len); 
-	char* input_file, output_file, key_file, func;
+	char* inputFile, *outputFile, *keyFile, *func;
+    mpz_set_si(key_len, DEFAULTLEN);
 
+    //handling flags from cli
 	for(int i=0; i<argc; i++){
 		if(strcmp(argv[i], "-i") == 0){
-            input_file = argv[i+1];
+            if (argv[i+1]!=NULL){
+                inputFile = argv[i+1];
+                printf("Input file: %s\n", inputFile);
+                continue;
+            }
+            printf("Give arguments in right order\n");
+
         }
         else if(strcmp(argv[i], "-o") == 0){
-            output_file = argv[i+1];
+            if (argv[i+1]!=NULL){
+                outputFile = argv[i+1];
+                printf("[DEBUG] %d\n", sizeof(outputFile));
+                printf("Output file: %s\n", outputFile);
+                continue;
+            }
+            printf("Give arguments in right order\n");
         }
         else if(strcmp(argv[i], "-k") == 0){
-            key_file = argv[i+1];   
+            if (argv[i+1]!=NULL){
+                keyFile = argv[i+1];
+                continue; 
+            } 
+            printf("Give arguments in right order\n"); 
         }
         else if(strcmp(argv[i], "-g") == 0){
-            mpz_set_ui(key_len, atoi(argv[i+1]));
-            generateRSAKeyPair(key_len);
+            if (argv[i+1]!=NULL){
+                mpz_set_ui(key_len, atoi(argv[i+1]));
+                generateRSAKeyPair(key_len);
+                continue;
+            }
+            printf("Give arguments in right order\n");
         }
         else if(strcmp(argv[i], "-e") == 0){
-            func = argv[i+1];
+            if (outputFile!=NULL && inputFile!=NULL && keyFile!=NULL){ //required -i -o -k
+                func = "encrypt";
+                continue;
+            }
+            printf("Give arguments in right order\n");
         }
         else if(strcmp(argv[i], "-d") == 0){
-            func = argv[i+1];
+            if (outputFile!=NULL && inputFile!=NULL && keyFile!=NULL){ //required -i -o -k
+                func = "decrypt";
+                continue;
+            }
+            printf("Give arguments in right order\n");
         }
         else if(strcmp(argv[i], "-a") == 0){
-            func = argv[i+1];
+            func = "all";
+            continue;
         }
 	}
 
-	if(func!=NULL && strcmp(func, "-e") == 0){
-		printf("hello peos\n");
-		encrypt(input_file, output_file, key_file);
+   //passing flags to according functions
+	if(func!=NULL && strcmp(func, "encrypt") == 0){
+		printf("Encrypting ...\n");
+		encrypt(inputFile, outputFile, keyFile);
+	}
+    if(func!=NULL && strcmp(func, "decrypt") == 0){
+		printf("Decrypting ...\n");
+		decrypt(inputFile, outputFile, keyFile);
 	}
 
 	mpz_clear(key_len);
@@ -59,6 +96,22 @@ void encrypt(char* input, char* output, char* keyf){
 	fclose(fp);
 }
 
+void decrypt(char* input, char*output, char* keyf){
+    FILE *fp;
+    fp = fopen(keyf, "r");
+    mpz_t keys[2];
+    mpz_inits(keys[0], keys[1], NULL);
+
+	mpz_inp_str(keys[0], fp, 10);
+	mpz_inp_str(keys[1], fp, 10);
+
+	decryptDataRSA(input, output, keys);
+
+	mpz_clears(keys[0], keys[1], NULL);
+	fclose(fp);
+} 
+
+
 void generateRSAKeyPair(mpz_t given_len){
 	mpz_t real_len, temp;
 	mpz_inits(real_len, temp, NULL);
@@ -70,7 +123,7 @@ void generateRSAKeyPair(mpz_t given_len){
 	mpz_inits(key[0], key[1], key[2], NULL);
 	randomPair(real_len, key);
 
-	printf("jello\n");
+	printf("Generating key...\n");
 
 	char* len_str = mpz_get_str(NULL, 10, given_len);
     char* public = (char*)malloc(strlen("public_") + strlen(len_str) + strlen(".key") + 1);
