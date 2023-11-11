@@ -15,3 +15,5 @@ Every type of number variables are mpz_t from the GMP library and the arithmetic
 </ul> 
 <p>NOTE! For the -a flag case the program reads the file 'message.txt' and sores the results into the 'performance.txt' file.
 You can try the test: ./rsa_assign_1 -a performance.txt</p>
+
+For this project usage of GNU Multiple Precision Library was necessary because of dealing with very long numbers.
