@@ -1,4 +1,4 @@
-# Assignment 1: Project for system security course at TUC.
+#Project for system security course at TUC.
 ## RSA Algorithm & Diffie–Hellman Key Exchange
 ### Diffie-Hellman Key Exchange Tool
 <p>The dh_assign_1.c file contains the implementation of the algorithm.
